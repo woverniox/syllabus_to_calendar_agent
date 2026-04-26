@@ -27,3 +27,7 @@ Thumbs.db
 db/
 redis_data/
 *.rdb
+
+*.pyc
+result
+var/

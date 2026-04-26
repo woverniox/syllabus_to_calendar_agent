@@ -34,26 +34,32 @@
             redis                      # The actual redis-server binary
           ];
 
-          shellHook = ''
+            shellHook = ''
             echo "--- Syllabus Agent Shell ---"
-            echo "Python: $(python --version)"
-            echo "Redis:  $(redis-server --version)"
             
-            # Start Redis in the background if it's not running
+            # Define exact paths relative to the flake root
+            SECRET_FILE="./agent-api/secrets.yaml"
+            ENV_FILE="./agent-api/.env"
+
+            if [ -f "$SECRET_FILE" ]; then
+              echo "🔓 Decrypting $SECRET_FILE into $ENV_FILE..."
+              
+              # Extract the specific key and save to the .env file
+              sops -d --extract '["google_secrets"]' "$SECRET_FILE" > "$ENV_FILE"
+              
+              # Load the variables into the current shell session
+              export $(grep -v '^#' "$ENV_FILE" | xargs)
+              export GOOGLE_API_KEY=$GEMINI_API_KEY
+              
+              echo "✅ Environment variables loaded for agent-api."
+            else
+              echo "⚠️ No secrets.yaml found at $SECRET_FILE."
+              echo "Current directory is: $(pwd)"
+            fi
+            # Start Redis Logic...
             if ! redis-cli ping > /dev/null 2>&1; then
-              echo "Starting local Redis instance..."
               redis-server --daemonize yes
             fi
-            
-            export GOOGLE_API_KEY=$(grep GOOGLE_API_KEY .env | cut -d '=' -f2)
-            echo "Environment ready."
-            # Automatically export the key from your .env file into the Nix shell environment
-            if [ -f .env ]; then
-              export $(grep -v '^#' .env | xargs)
-              # Ensure the SDK sees the specific name it wants
-              export GOOGLE_API_KEY=$GEMINI_API_KEY
-            fi
-              echo "✅ Environment variables loaded for google-genai."
           '';
         };
       });

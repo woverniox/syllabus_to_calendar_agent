@@ -17,7 +17,8 @@ import sys
 from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass
-
+import requests
+import io
 
 @dataclass
 class EvalResult:
@@ -31,104 +32,66 @@ class EvalResult:
     score_in_range: Optional[bool]
     error: Optional[str] = None
 
-
-def load_test_cases(path: str = "eval/cases/eval-suite-v1.json") -> list[dict]:
-    """Load test cases from JSON file."""
+def load_test_cases():
+    # Change this line to point to your new 20-case JSON
+    with open("cases/eval-suite-v1.json", "r") as f: 
+        return json.load(f)
+    
+def load_expected_outputs(path: str = "expected-outputs.json") -> list[dict]:
     with open(path) as f:
         return json.load(f)
 
-
-def load_expected_outputs(path: str = "eval/expected-outputs.json") -> list[dict]:
-    """Load expected outputs from JSON file."""
-    with open(path) as f:
-        return json.load(f)
-
-
-def run_agent(lead_input: dict) -> dict:
+def run_agent(test_input: dict) -> dict:
     """
-    Run the agent on a single lead input.
-
-    TODO: Implement in Week 6
-    - Import the agent module
-    - Call the agent with the lead input
-    - Return the result
+    Calls the Syllabus Agent /syllabus endpoint using multipart form data.
     """
-    # Placeholder implementation
-    # from agent import LeadAgent
-    # from models import LeadInput
-    # agent = LeadAgent()
-    # lead = LeadInput(**lead_input)
-    # result = agent.run(lead)
-    # return result.model_dump()
+    url = "http://localhost:8000/syllabus"
+    content = test_input.get("content", "Empty Syllabus")
+    course_code = test_input.get("course_code", "UNKNOWN")
 
-    # For now, return a mock result
-    return {
-        "tier": "needs_info",
-        "score": 0,
-        "approval_required": False,
-        "segment": "smb"
-    }
-
-
-def evaluate_case(test_case: dict, expected: dict) -> EvalResult:
-    """
-    Evaluate a single test case.
-
-    Compares agent output against expected output for:
-    - Correct tier classification
-    - Correct approval requirement
-    - Score within expected range (if specified)
-    """
-    case_id = test_case["id"]
+    file_io = io.BytesIO(content.encode('utf-8'))
+    files = {'file': ('test.txt', file_io, 'text/plain')}
+    data = {'course_code': course_code}
 
     try:
-        # Run the agent
-        result = run_agent(test_case["input"])
-
-        # Check tier
-        expected_tier = expected["tier"]
-        actual_tier = result.get("tier")
-        tier_match = actual_tier == expected_tier
-
-        # Check approval
-        expected_approval = expected.get("approval_required", False)
-        actual_approval = result.get("approval_required", False)
-        approval_match = actual_approval == expected_approval
-
-        # Check score range if specified
-        score_in_range = None
-        if "score_range" in expected:
-            min_score, max_score = expected["score_range"]
-            actual_score = result.get("score", 0)
-            score_in_range = min_score <= actual_score <= max_score
-
-        # Overall pass/fail
-        passed = tier_match and approval_match
-        if score_in_range is not None:
-            passed = passed and score_in_range
-
-        return EvalResult(
-            case_id=case_id,
-            passed=passed,
-            expected_tier=expected_tier,
-            actual_tier=actual_tier,
-            expected_approval=expected_approval,
-            actual_approval=actual_approval,
-            score_in_range=score_in_range
-        )
-
+        response = requests.post(url, files=files, data=data)
+        return response.json()
     except Exception as e:
-        return EvalResult(
-            case_id=case_id,
-            passed=False,
-            expected_tier=expected.get("tier", "unknown"),
-            actual_tier=None,
-            expected_approval=expected.get("approval_required", False),
-            actual_approval=None,
-            score_in_range=None,
-            error=str(e)
-        )
+        return {"error": str(e)}
 
+def evaluate_case(test_case: dict, expected: dict = None) -> EvalResult:
+    """
+    Updated to handle the 'expected' argument being passed by the loop.
+    We pull the actual expectations directly from the test_case.
+    """
+    case_id = test_case["id"]
+    
+    # 1. Run the agent
+    actual_response = run_agent(test_case["input"])
+    
+    # 2. Get the actual extraction count
+    actual_events = actual_response.get("data", [])
+    actual_count = len(actual_events)
+    
+    # 3. Pull expectations from the nested 'expected' block
+    expectations = test_case.get("expected", {})
+    expected_count = expectations.get("assignment_count", 0)
+    expected_course = expectations.get("course_name", "UNKNOWN")
+    
+    # 4. Validation Logic
+    actual_msg = actual_response.get("message", "")
+    course_match = expected_course.upper() in actual_msg.upper()
+    passed = (actual_count == expected_count) and course_match
+
+    return EvalResult(
+        case_id=case_id,
+        passed=passed,
+        expected_tier=f"Count: {expected_count}",
+        actual_tier=f"Count: {actual_count}",
+        expected_approval=True,
+        actual_approval=course_match,
+        score_in_range=True
+    )
 
 def run_eval(verbose: bool = False, case_id: Optional[int] = None) -> tuple[int, int, list[EvalResult]]:
     """

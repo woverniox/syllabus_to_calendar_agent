@@ -1,47 +1,211 @@
 [
   {
     "id": 1,
-    "tier": "needs_info",
-    "missing_fields": ["need", "timeline"],
-    "approval_required": false,
-    "expected_action": "ask_clarifying_questions"
+    "course_name": "CS101: Introduction to Programming",
+    "date_formats": [
+      "MM/DD/YYYY",
+      "Month DD"
+    ],
+    "late_policy_keywords": [
+      "penalty",
+      "24 hours",
+      "grace period"
+    ],
+    "holidays": [
+      "Labor Day",
+      "Thanksgiving"
+    ],
+    "assignment_types": [
+      "Lab",
+      "Quiz",
+      "Final Project"
+    ]
   },
-  { 
+  {
     "id": 2,
-    "tier": "needs_info",
-    "missing_fields": ["timeline"],
-    "approval_required": false,
-    "expected_action": "ask_clarifying_questions"
+    "course_name": "HIST210: Modern World History",
+    "date_formats": [
+      "DD-MM-YY",
+      "YYYY/MM/DD"
+    ],
+    "late_policy_keywords": [
+      "deduction",
+      "pro-rated",
+      "no extensions"
+    ],
+    "holidays": [
+      "Veterans Day",
+      "Winter Break"
+    ],
+    "assignment_types": [
+      "Essay",
+      "Primary Source Analysis",
+      "Midterm"
+    ]
   },
-  { 
+  {
     "id": 3,
-    "tier": "needs_info",
-    "missing_fields": ["email"],
-    "approval_required": false,
-    "expected_action": "ask_clarifying_questions"
+    "course_name": "MATH302: Linear Algebra",
+    "date_formats": [
+      "MM.DD",
+      "YYYY-MM-DD"
+    ],
+    "late_policy_keywords": [
+      "unexcused",
+      "letter grade",
+      "zero"
+    ],
+    "holidays": [
+      "MLK Day",
+      "Spring Break"
+    ],
+    "assignment_types": [
+      "Problem Set",
+      "Take-home Exam",
+      "Workshop"
+    ]
   },
-  { 
+  {
     "id": 4,
-    "tier": "needs_info",
-    "missing_fields": ["company", "need", "timeline"],
-    "approval_required": false,
-    "expected_action": "ask_clarifying_questions"
+    "course_name": "BIO150: Molecular Biology",
+    "date_formats": [
+      "Day, Month DD",
+      "MM/DD"
+    ],
+    "late_policy_keywords": [
+      "documentation",
+      "emergency",
+      "point drop"
+    ],
+    "holidays": [
+      "Fall Break"
+    ],
+    "assignment_types": [
+      "Lab Report",
+      "Pre-lab Quiz",
+      "Practical Exam"
+    ]
   },
-  { 
+  {
     "id": 5,
-    "tier": "reject",
-    "score_range": [0, 25],
-    "approval_required": true,
-    "expected_action": "request_approval"
+    "course_name": "ENG102: Composition & Rhetoric",
+    "date_formats": [
+      "Month DD, YYYY"
+    ],
+    "late_policy_keywords": [
+      "submission window",
+      "late work",
+      "per day"
+    ],
+    "holidays": [
+      "Juneteenth",
+      "Independence Day"
+    ],
+    "assignment_types": [
+      "Peer Review",
+      "Annotated Bibliography",
+      "Final Draft"
+    ]
   },
-  { 
+  {
     "id": 6,
-    "tier": "reject",
-    "score_range": [0, 20],
-    "approval_required": true,
-    "expected_action": "flag_as_spam"
+    "course_name": "PSYC201: Developmental Psychology",
+    "date_formats": [
+      "MM/DD/YY"
+    ],
+    "late_policy_keywords": [
+      "valid excuse",
+      "reduction",
+      "11:59 PM"
+    ],
+    "holidays": [
+      "Easter Monday"
+    ],
+    "assignment_types": [
+      "Case Study",
+      "Discussion Post",
+      "Term Paper"
+    ]
   },
-  { 
+  {
     "id": 7,
-    "tier": "reject",
-    "score_range": [0, 35],
+    "course_name": "ART330: Renaissance Art",
+    "date_formats": [
+      "DD Month YYYY"
+    ],
+    "late_policy_keywords": [
+      "final deadline",
+      "non-negotiable",
+      "tardy"
+    ],
+    "holidays": [
+      "Indigenous Peoples' Day"
+    ],
+    "assignment_types": [
+      "Visual Analysis",
+      "Slide Quiz",
+      "Exhibition Review"
+    ]
+  },
+  {
+    "id": 8,
+    "course_name": "PHYS101: General Physics I",
+    "date_formats": [
+      "YYYYMMDD",
+      "MM/DD"
+    ],
+    "late_policy_keywords": [
+      "weighted penalty",
+      "late submission",
+      "half credit"
+    ],
+    "holidays": [
+      "Memorial Day"
+    ],
+    "assignment_types": [
+      "MasteringPhysics",
+      "Recitation",
+      "Final Exam"
+    ]
+  },
+  {
+    "id": 9,
+    "course_name": "ECON405: Macroeconomics",
+    "date_formats": [
+      "Month DD"
+    ],
+    "late_policy_keywords": [
+      "automatic deduction",
+      "extension request",
+      "not accepted"
+    ],
+    "holidays": [
+      "President's Day"
+    ],
+    "assignment_types": [
+      "Data Exercise",
+      "Policy Brief",
+      "Group Presentation"
+    ]
+  },
+  {
+    "id": 10,
+    "course_name": "PHIL110: Ethics",
+    "date_formats": [
+      "DD.MM.YYYY"
+    ],
+    "late_policy_keywords": [
+      "grade cap",
+      "extenuating",
+      "2-day limit"
+    ],
+    "holidays": [
+      "Reading Day"
+    ],
+    "assignment_types": [
+      "Reflection Paper",
+      "Socratic Seminar",
+      "Oral Exam"
+    ]
+  }
+]
