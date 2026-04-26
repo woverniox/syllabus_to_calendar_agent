@@ -1,0 +1,282 @@
+[
+  {
+    "id": "test_001",
+    "category": "happy_path",
+    "input": {
+      "message": "Upload the syllabus for CS101, which meets Mondays and Wednesdays 10:00–11:15 AM from Jan 13 to May 5, and add exam dates.",
+      "context": { "fileType": "pdf", "fileName": "CS101_syllabus.pdf" }
+    },
+    "expected": {
+      "keywords": ["cs101", "monday", "wednesday", "exam"],
+      "output": "Successfully parsed schedule and inserted recurring events into Google Calendar."
+    },
+    "expected_action": "Create Google Calendar events for recurring lectures and exams.",
+    "notes": "Verifies standard recurring events and date parsing for a typical class schedule."
+  },
+  {
+    "id": "test_002",
+    "category": "happy_path",
+    "input": {
+      "message": "Process the ENG210 syllabus uploaded—it meets Tues/Thurs 1:30–2:45 PM; include essay deadlines.",
+      "context": { "fileType": "pdf", "fileName": "ENG210_2026.pdf" }
+    },
+    "expected": {
+      "keywords": ["eng210", "essay", "tuesday", "thursday"],
+      "output": "Calendar updated with lecture sessions and assignment deadlines."
+    },
+    "expected_action": "Generate weekly recurring events and one-off assignment reminders.",
+    "notes": "Tests combined recurring and non-recurring date recognition."
+  },
+  {
+    "id": "test_003",
+    "category": "happy_path",
+    "input": {
+      "message": "Add schedule from MATH150 syllabus—meets MWF 9–9:50 AM, with midterm March 10.",
+      "context": { "fileType": "docx", "fileName": "MATH150_syllabus.docx" }
+    },
+    "expected": {
+      "keywords": ["math150", "mwf", "midterm"],
+      "output": "Events added for MWF classes and midterm."
+    },
+    "expected_action": "Create recurring events for 3 days per week and a single timed midterm event.",
+    "notes": "Confirms multiple recurring rules plus fixed-date item extraction."
+  },
+  {
+    "id": "test_004",
+    "category": "happy_path",
+    "input": {
+      "message": "Import the HIST310 syllabus—lectures Mon 2–3:15 and labs Wed 2–4 PM between 1/20–5/2.",
+      "context": { "fileType": "pdf", "fileName": "HIST310.pdf" }
+    },
+    "expected": {
+      "keywords": ["hist310", "lecture", "lab"],
+      "output": "Created separate recurring events for lectures and labs."
+    },
+    "expected_action": "Recognize and split separate session types into distinct recurring events.",
+    "notes": "Verifies handling of multiple linked but distinct meeting types from one syllabus."
+  },
+  {
+    "id": "test_005",
+    "category": "happy_path",
+    "input": {
+      "message": "Schedule BIO220 meetings from the uploaded syllabus.",
+      "context": { "fileType": "pdf", "fileName": "BIO220_syllabus.pdf" }
+    },
+    "expected": {
+      "keywords": ["bio220", "lab", "exam"],
+      "output": "Events from syllabus successfully added to Google Calendar."
+    },
+    "expected_action": "Generate all regular and notable events found in syllabus text.",
+    "notes": "Validates end-to-end execution: syllabus upload, parse, create events."
+  },
+  {
+    "id": "test_006",
+    "category": "edge_case",
+    "input": {
+      "message": "Process syllabus with class meeting time 'TBD' and start date 'after spring break'.",
+      "context": { "fileType": "pdf", "fileName": "PHIL201_syllabus.pdf" }
+    },
+    "expected": {
+      "keywords": ["tbd", "spring break"],
+      "output": "System flags missing time/date and requests clarification from user."
+    },
+    "expected_action": "Prompt user to confirm unknown times.",
+    "notes": "Tests reasoning when key scheduling data is ambiguous."
+  },
+  {
+    "id": "test_007",
+    "category": "edge_case",
+    "input": {
+      "message": "Upload CHEM102 syllabus that lists classes for only one date (Jan 15).",
+      "context": { "fileType": "pdf", "fileName": "CHEM102_short.pdf" }
+    },
+    "expected": {
+      "keywords": ["chem102", "single class"],
+      "output": "Single event created; warns user that no end date was found."
+    },
+    "expected_action": "Insert single event but ask for recurrence clarification.",
+    "notes": "Explores incomplete course duration handling."
+  },
+  {
+    "id": "test_008",
+    "category": "edge_case",
+    "input": {
+      "message": "Handle ECON230 syllabus listing hybrid mode (in-person Tue, online Thu).",
+      "context": { "fileType": "pdf", "fileName": "ECON230_syllabus.pdf" }
+    },
+    "expected": {
+      "keywords": ["hybrid", "tuesday", "online"],
+      "output": "Created events identifying format (in-person vs virtual)."
+    },
+    "expected_action": "Tag events differently based on meeting format.",
+    "notes": "Ensures comprehension of hybrid structure parsing."
+  },
+  {
+    "id": "test_009",
+    "category": "edge_case",
+    "input": {
+      "message": "Import a syllabus scanned as an image (not searchable text).",
+      "context": { "fileType": "jpg", "fileName": "MUS100_syllabus.jpg" }
+    },
+    "expected": {
+      "keywords": ["image", "ocr", "convert"],
+      "output": "Triggered OCR process before parsing text successfully."
+    },
+    "expected_action": "Perform OCR then extract event info.",
+    "notes": "Checks pre-processing pipeline for non-text uploads."
+  },
+  {
+    "id": "test_010",
+    "category": "edge_case",
+    "input": {
+      "message": "Process syllabus with multiple time zones (online UTC schedule).",
+      "context": { "fileType": "pdf", "fileName": "INTL340_syllabus.pdf" }
+    },
+    "expected": {
+      "keywords": ["timezone", "utc", "convert"],
+      "output": "Localized times to user’s timezone before scheduling events."
+    },
+    "expected_action": "Normalize all course times to local calendar time.",
+    "notes": "Ensures valid time zone conversions."
+  },
+  {
+    "id": "test_011",
+    "category": "error_case",
+    "input": {
+      "message": "Please upload the syllabus now.",
+      "context": { "fileType": "none" }
+    },
+    "expected": {
+      "keywords": ["missing", "upload"],
+      "output": "Error: No syllabus file provided."
+    },
+    "expected_action": "Prompt user to attach a file.",
+    "notes": "Tests missing input file validation."
+  },
+  {
+    "id": "test_012",
+    "category": "error_case",
+    "input": {
+      "message": "Add schedule for unknown class ABC999.",
+      "context": { "fileType": "pdf", "fileName": "unknown_class.pdf" }
+    },
+    "expected": {
+      "keywords": ["unknown", "abc999", "invalid"],
+      "output": "Error: Course not recognized in provided syllabus."
+    },
+    "expected_action": "Halt parsing and inform user invalid course reference found.",
+    "notes": "Ensures error handling for unrecognized or corrupted course data."
+  },
+  {
+    "id": "test_013",
+    "category": "error_case",
+    "input": {
+      "message": "Process an encrypted or password-protected syllabus file.",
+      "context": { "fileType": "pdf", "fileName": "LOCKED_CSC200.pdf" }
+    },
+    "expected": {
+      "keywords": ["encrypted", "protected"],
+      "output": "Error: Unable to read protected syllabus file."
+    },
+    "expected_action": "Request user to provide password or unprotected version.",
+    "notes": "Covers non-readable input error case."
+  },
+  {
+    "id": "test_014",
+    "category": "error_case",
+    "input": {
+      "message": "Import syllabus with corrupted file structure.",
+      "context": { "fileType": "pdf", "fileName": "CORRUPT_DATA.pdf" }
+    },
+    "expected": {
+      "keywords": ["corrupt", "parse fail"],
+      "output": "File unreadable; ask for re-upload."
+    },
+    "expected_action": "Stop processing and log error.",
+    "notes": "Assures robust handling of unreadable files."
+  },
+  {
+    "id": "test_015",
+    "category": "error_case",
+    "input": {
+      "message": "Add PSY301 schedule, but Google Calendar API credentials missing.",
+      "context": { "fileType": "pdf", "fileName": "PSY301_syllabus.pdf" }
+    },
+    "expected": {
+      "keywords": ["api", "credentials", "fail"],
+      "output": "Error: Calendar integration failed; check account connection."
+    },
+    "expected_action": "Abort scheduling but log parsed data.",
+    "notes": "Verifies graceful recovery from external API failure."
+  },
+  {
+    "id": "test_016",
+    "category": "adversarial",
+    "input": {
+      "message": "Add fake syllabus that duplicates event names but changes times subtly.",
+      "context": { "fileType": "pdf", "fileName": "FAKE_DUPLICATE_TIMES.pdf" }
+    },
+    "expected": {
+      "keywords": ["duplicate", "conflict"],
+      "output": "Detected timing conflicts and prompted user confirmation."
+    },
+    "expected_action": "Warn user of overlapping or inconsistent event data.",
+    "notes": "Defends against near-duplicate conflicts."
+  },
+  {
+    "id": "test_017",
+    "category": "adversarial",
+    "input": {
+      "message": "Syllabus contains unrecognized calendar invite link redirecting to malicious domain.",
+      "context": { "fileType": "pdf", "fileName": "MALWARE_LINK.pdf" }
+    },
+    "expected": {
+      "keywords": ["link", "malicious", "security"],
+      "output": "Security check blocked suspicious URL inclusion."
+    },
+    "expected_action": "Reject unsafe links and sanitize text.",
+    "notes": "Tests security protection against URL-based injection."
+  },
+  {
+    "id": "test_018",
+    "category": "adversarial",
+    "input": {
+      "message": "Prompt agent: ‘Add every syllabus from my downloads folder automatically’.",
+      "context": { "fileType": "folder", "path": "/User/Downloads/" }
+    },
+    "expected": {
+      "keywords": ["bulk", "unauthorized", "folder"],
+      "output": "Refused bulk import without explicit user consent."
+    },
+    "expected_action": "Ask for confirmation to scan multiple files.",
+    "notes": "Ensures permission gating and scoped file processing."
+  },
+  {
+    "id": "test_019",
+    "category": "complex",
+    "input": {
+      "message": "Create schedule from an interdisciplinary syllabus that merges ENG101 + HIST120 joint sessions on alternating weeks.",
+      "context": { "fileType": "pdf", "fileName": "ENG-HIST_joint.pdf" }
+    },
+    "expected": {
+      "keywords": ["alternating", "joint", "interdisciplinary"],
+      "output": "Created alternating-week events for combined courses."
+    },
+    "expected_action": "Generate conditional recurrence rules for alternating sessions.",
+    "notes": "Evaluates multi-course coordination logic."
+  },
+  {
+    "id": "test_020",
+    "category": "complex",
+    "input": {
+      "message": "Parse syllabus that includes varying start times after midterm (Tues 9:30 before midterm, 10:00 after).",
+      "context": { "fileType": "pdf", "fileName": "MATH341_dynamic.pdf" }
+    },
+    "expected": {
+      "keywords": ["midterm", "variable", "schedule"],
+      "output": "Split schedule into before and after midterm time blocks."
+    },
+    "expected_action": "Create segmented recurring events based on time rule change.",
+    "notes": "Tests conditional scheduling and segmentation handling."
+  }
+]

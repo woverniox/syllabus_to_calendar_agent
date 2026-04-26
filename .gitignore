@@ -1,0 +1,29 @@
+# Environment
+.env
+*.env.local
+.direnv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+
+# Data
+data/traces/*.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker data volumes
+db/
+redis_data/
+*.rdb

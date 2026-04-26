@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Eval Case",
+  "type": "object",
+  "required": ["id", "category", "input", "expected", "notes"],
+  "properties": {
+    "id": { "type": "string" },
+    "category": { "type": "string", "enum": ["happy_path", "edge_case", "error_case", "adversarial", "complex"] },
+    "description": { "type": "string" },
+    "input": {
+      "type": "object",
+      "required": ["message"],
+      "properties": {
+        "message": { "type": "string" },
+        "context": { "type": "object" }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "required": ["keywords", "output"]
+    },
+    "expected_action": { "type": "string" },
+    "notes": { "type": "string" }
+  }
+}
+

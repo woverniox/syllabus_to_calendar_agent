@@ -1,0 +1,15 @@
+fastapi==0.109.0
+uvicorn==0.27.0
+google-genai==0.3.0
+pydantic[email]==2.5.3
+python-dotenv==1.0.0
+redis==5.0.1
+asyncpg==0.29.0
+sqlalchemy==2.0.25
+httpx==0.26.0
+python-multipart==0.0.9
+pypdf>=4.0.0
+pyyaml
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client

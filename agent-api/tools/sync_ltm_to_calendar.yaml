@@ -1,0 +1,143 @@
+name: sync_ltm_to_calendar
+version: 1.0.0
+description: >
+  Extracts a user schedule stored in long-term memory and creates or updates
+  corresponding events in Google Calendar.
+
+inputs:
+  schedule_source:
+    type: string
+    description: >
+      Identifier, tag, or key used to retrieve the structured schedule
+      from long-term memory (for example, "current_semester_schedule").
+  google_credentials:
+    type: object
+    description: >
+      OAuth2 credentials or a reference to an authorized Google Calendar
+      client configuration.
+    properties:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+      refresh_token:
+        type: string
+      calendar_id:
+        type: string
+        description: >
+          Target calendar ID, e.g., "primary" or a specific calendar address.
+  default_time_zone:
+    type: string
+    description: >
+      IANA time zone for events that do not specify a time zone,
+      for example "America/New_York".
+  dry_run:
+    type: boolean
+    description: >
+      If true, no events are actually created; the tool only returns
+      the planned event payloads.
+
+processing:
+  - step: load_schedule
+    description: >
+      Fetch the schedule data object from long-term memory, including titles,
+      start/end times, locations, and descriptions.
+    action: load_ltm_object
+    params:
+      source_key: schedule_source
+      output_field: raw_schedule
+
+  - step: normalize_schedule
+    description: >
+      Normalize schedule items into a standard list of event objects with
+      explicit start and end timestamps.
+    action: transform_data
+    params:
+      input_field: raw_schedule
+      output_field: events_normalized
+      mapping:
+        type: list
+        items:
+          type: object
+          properties:
+            uid:
+              type: string
+              description: Unique ID for de-duplication and updates.
+            title:
+              type: string
+              description: Event summary/title.
+            description:
+              type: string
+            location:
+              type: string
+            start:
+              type: string
+              description: >
+                Start in ISO 8601 datetime format (e.g. 2026-02-01T09:00:00).
+            end:
+              type: string
+              description: >
+                End in ISO 8601 datetime format.
+            time_zone:
+              type: string
+              description: >
+                Optional IANA time zone; if missing, default_time_zone is used.
+            recurrence:
+              type: string
+              description: >
+                Optional recurrence rule (RRULE syntax) if the schedule
+                includes repeating events.
+
+  - step: build_calendar_payloads
+    description: >
+      Convert normalized events into Google Calendar API payloads.
+    action: transform_data
+    params:
+      input_field: events_normalized
+      output_field: calendar_event_payloads
+      operations:
+        - type: map
+          expression: |
+            {
+              "uid": item.uid,
+              "calendar_id": google_credentials.calendar_id,
+              "resource": {
+                "summary": item.title,
+                "description": item.description,
+                "location": item.location,
+                "start": {
+                  "dateTime": item.start,
+                  "timeZone": item.time_zone or default_time_zone
+                },
+                "end": {
+                  "dateTime": item.end,
+                  "timeZone": item.time_zone or default_time_zone
+                },
+                "recurrence": item.recurrence ? [ item.recurrence ] : []
+              }
+            }
+
+  - step: sync_to_google_calendar
+    description: >
+      Create or update events in Google Calendar using the prepared payloads.
+    action: google_calendar_sync
+    params:
+      credentials_field: google_credentials
+      events_field: calendar_event_payloads
+      dry_run_field: dry_run
+      strategy:
+        mode: upsert
+        match_key: uid
+        create_method: events.insert
+        update_method: events.update
+
+outputs:
+  synced_events:
+    type: list
+    description: >
+      List of Google Calendar event metadata for all created or updated events.
+  dry_run_report:
+    type: list
+    description: >
+      When dry_run is true, the list of event payloads that would be sent
+      to Google Calendar instead of actually creating them.

@@ -1,0 +1,12 @@
+# config/syllabus-guardrails-v1.yaml
+version: "1.0"
+
+# Strategy 2: Security & Content Validation
+input_validation:
+  blocked_keywords: ["hack", "sudo", "bypass", "ignore previous instructions"]
+  min_text_length: 50
+
+# Checkpoint 1: Decision Loop Thresholds
+approval_logic:
+  require_manual_review_below: 0.70  # If AI is <70% sure, trigger "Review" status
+  auto_reject_below: 0.30           # If AI is <30% sure, trigger "Failed" status

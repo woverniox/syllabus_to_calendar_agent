@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "tier": "needs_info",
+    "missing_fields": ["need", "timeline"],
+    "approval_required": false,
+    "expected_action": "ask_clarifying_questions"
+  },
+  { 
+    "id": 2,
+    "tier": "needs_info",
+    "missing_fields": ["timeline"],
+    "approval_required": false,
+    "expected_action": "ask_clarifying_questions"
+  },
+  { 
+    "id": 3,
+    "tier": "needs_info",
+    "missing_fields": ["email"],
+    "approval_required": false,
+    "expected_action": "ask_clarifying_questions"
+  },
+  { 
+    "id": 4,
+    "tier": "needs_info",
+    "missing_fields": ["company", "need", "timeline"],
+    "approval_required": false,
+    "expected_action": "ask_clarifying_questions"
+  },
+  { 
+    "id": 5,
+    "tier": "reject",
+    "score_range": [0, 25],
+    "approval_required": true,
+    "expected_action": "request_approval"
+  },
+  { 
+    "id": 6,
+    "tier": "reject",
+    "score_range": [0, 20],
+    "approval_required": true,
+    "expected_action": "flag_as_spam"
+  },
+  { 
+    "id": 7,
+    "tier": "reject",
+    "score_range": [0, 35],

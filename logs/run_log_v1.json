@@ -1,0 +1,122 @@
+[
+{
+"run_id": "RUN-001",
+"timestamp": "2026-03-01T09:00:00Z",
+"task": "Create schedule from single syllabus",
+"input_message": "Here's my syllabus for BIO101, can you add all assignments to my calendar?",
+"tools_used": ["parse_syllabus_document", "schedule_optimizer", "google_calendar_api"],
+"outcome": "success",
+"duration_ms": 2750,
+"tokens_used": 980,
+"error": null,
+"notes": "Parsed PDF syllabus, generated assignment list, and created dated calendar events with default 1-day-before reminders"
+},
+{
+"run_id": "RUN-002",
+"timestamp": "2026-03-01T09:15:00Z",
+"task": "Handle multiple syllabi upload",
+"input_message": "Uploading 3 syllabi for CS201, MATH210, and HIST150. Please build a combined schedule.",
+"tools_used": ["parse_syllabus_document", "schedule_optimizer"],
+"outcome": "success",
+"duration_ms": 3920,
+"tokens_used": 1320,
+"error": null,
+"notes": "Detected conflicting due dates and auto-distributed study sessions across the week to avoid overload"
+},
+{
+  "run_id": "RUN-003",
+  "timestamp": "2026-03-01T09:30:00Z",
+  "task": "Create draft events from schedule",
+  "input_message": "Sync my Spring 2026 schedule into the Google Calendar tab I have open.",
+  "tools_used": ["event_sync_manager"],
+  "outcome": "failure",
+  "duration_ms": 5100,
+  "tokens_used": 610,
+  "error": "NO_CALENDAR_CONTEXT: No active Google Calendar tab detected",
+  "notes": "FAILURE #1 - Agent prepared event payloads and instructed user to paste them into the open Google Calendar tab; cannot directly access calendar without explicit in-tab context"
+}
+{
+"run_id": "RUN-004",
+"timestamp": "2026-03-01T10:00:00Z",
+"task": "Update syllabus changes",
+"input_message": "Professor moved the midterm from March 10 to March 17. Can you update my calendar?",
+"tools_used": ["course_portal_verification", "event_sync_manager"],
+"outcome": "success",
+"duration_ms": 1880,
+"tokens_used": 740,
+"error": null,
+"notes": "Verified new midterm date on course portal and updated existing calendar event instead of creating duplicates"
+},
+{
+"run_id": "RUN-005",
+"timestamp": "2026-03-01T10:30:00Z",
+"task": "Adjust reminders",
+"input_message": "Set reminders 3 days before every major exam and 1 day before homework.",
+"tools_used": ["schedule_optimizer", "google_calendar_api"],
+"outcome": "success",
+"duration_ms": 1760,
+"tokens_used": 690,
+"error": null,
+"notes": "Classified events by type (exam vs assignment) and applied differentiated reminder rules"
+},
+{
+"run_id": "RUN-006",
+"timestamp": "2026-03-01T11:00:00Z",
+"task": "Process ambiguous request",
+"input_message": "Can you help organize my semester?",
+"tools_used": [],
+"outcome": "partial",
+"duration_ms": 1020,
+"tokens_used": 340,
+"error": null,
+"notes": "No tools used; asked clarifying questions about syllabi, courses, and preferred study hours"
+},
+{
+"run_id": "RUN-007",
+"timestamp": "2026-03-01T11:30:00Z",
+"task": "Handle unreadable syllabus",
+"input_message": "This photo of my printed syllabus is all I have, can you use it?",
+"tools_used": ["parse_syllabus_document"],
+"outcome": "failure",
+"duration_ms": 1410,
+"tokens_used": 480,
+"error": "PARSING_ERROR: OCR_LOW_CONFIDENCE",
+"notes": "FAILURE #2 - Image quality too low; requested clearer photo or digital file"
+},
+{
+"run_id": "RUN-008",
+"timestamp": "2026-03-01T12:00:00Z",
+"task": "Generate study blocks",
+"input_message": "I have classes on Mon/Wed/Fri. Add 2-hour study blocks for each class on non-class days.",
+"tools_used": ["schedule_optimizer", "google_calendar_api"],
+"outcome": "success",
+"duration_ms": 2320,
+"tokens_used": 720,
+"error": null,
+"notes": "Respected existing calendar events while inserting recurring study sessions"
+},
+{
+"run_id": "RUN-009",
+"timestamp": "2026-03-01T14:00:00Z",
+"task": "Align with academic calendar",
+"input_message": "Make sure nothing is scheduled during spring break.",
+"tools_used": ["academic_calendar_adapter", "event_sync_manager"],
+"outcome": "success",
+"duration_ms": 1670,
+"tokens_used": 560,
+"error": null,
+"notes": "Imported institutional academic calendar, shifted affected study blocks and soft deadlines outside break week"
+},
+{
+"run_id": "RUN-010",
+"timestamp": "2026-03-01T15:00:00Z",
+"task": "Complex multi-course planning",
+"input_message": "I’m taking 5 classes and working 20 hours/week. Please build a realistic schedule and add everything to Google Calendar.",
+"tools_used": ["parse_syllabus_document", "schedule_optimizer", "event_sync_manager", "google_calendar_api"],
+"outcome": "success",
+"duration_ms": 4980,
+"tokens_used": 1490,
+"error": null,
+"notes": "Multi-tool orchestration balancing workload, work hours, and deadlines; flagged overloaded weeks and suggested early start on long projects"
+}
+]

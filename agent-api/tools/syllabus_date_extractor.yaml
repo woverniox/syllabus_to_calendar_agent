@@ -1,0 +1,113 @@
+name: syllabus-date-extractor
+version: 1.0.0
+description: >
+  Extracts assignment dates from syllabus documents stored in long-term memory
+  and exports them to an Excel spreadsheet.
+
+inputs:
+  syllabus_sources:
+    type: list
+    items:
+      type: string
+    description: >
+      Identifiers, paths, or tags for syllabus documents in long-term memory
+      to scan for assignment information.
+  output_excel_path:
+    type: string
+    description: >
+      Destination path (including filename) for the generated Excel workbook,
+      for example: "outputs/syllabus_assignments.xlsx".
+
+processing:
+  - step: load_syllabi
+    description: >
+      Load the syllabus documents referenced by `syllabus_sources` from
+      long-term memory and normalize them to plain text.
+    action: load_documents
+    params:
+      source_field: syllabus_sources
+      output_field: syllabus_texts
+
+  - step: extract_assignments
+    description: >
+      Parse each syllabus text and extract assignments with their titles,
+      due dates, and any related metadata.
+    action: extract_structured_data
+    params:
+      input_field: syllabus_texts
+      output_field: assignments
+      extraction_schema:
+        type: list
+        items:
+          type: object
+          properties:
+            course_id:
+              type: string
+              description: Course identifier if present in the syllabus.
+            assignment_title:
+              type: string
+              description: Assignment name or short description.
+            due_date:
+              type: string
+              description: >
+                Due date in ISO 8601 format (YYYY-MM-DD). The tool should
+                normalize natural language dates (e.g., "Sept 15", "Week 3
+                Friday") into this format when possible.
+            original_due_text:
+              type: string
+              description: >
+                Original due-date text span from the syllabus for traceability.
+            weight:
+              type: string
+              description: Grade weight or points if available.
+            notes:
+              type: string
+              description: Additional notes, such as submission method or time.
+
+  - step: filter_and_sort
+    description: >
+      Filter out records without a recognized due date and sort remaining
+      assignments chronologically.
+    action: transform_data
+    params:
+      input_field: assignments
+      output_field: assignments_sorted
+      operations:
+        - type: filter
+          condition: "item.due_date is not null and item.due_date != ''"
+        - type: sort
+          key: due_date
+          order: asc
+
+  - step: write_excel
+    description: >
+      Write the extracted assignment data to an Excel workbook with a single
+      sheet named 'Assignments', one row per assignment.
+    action: write_excel
+    params:
+      input_field: assignments_sorted
+      output_excel_path_field: output_excel_path
+      workbook:
+        sheets:
+          - name: Assignments
+            columns:
+              - header: Course ID
+                field: course_id
+              - header: Assignment Title
+                field: assignment_title
+              - header: Due Date
+                field: due_date
+                format: "yyyy-mm-dd"
+              - header: Original Due Text
+                field: original_due_text
+              - header: Weight
+                field: weight
+              - header: Notes
+                field: notes
+
+outputs:
+  excel_file:
+    type: file
+    description: >
+      The generated Excel file stored at `output_excel_path`, containing all
+      extracted assignments and their due dates.
